@@ -1,0 +1,96 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+##ESTADISTICA DESCRIPTIVA Y TESTEO
+###Obteniendo la data
+```{r}
+data(cars)
+```
+###Asigno data de autos dentro de una variable
+```{r}
+autos <-data.frame(cars)
+write.csv(autos, file = "autos.csv")
+```
+###Estadistica descriptiva de la data: ¿Como los leemos? 
+```{r}
+summary(autos)
+```
+###Desviacion estandar de cada variable
+```{r}
+sd(autos$speed)
+sd(autos$dist)
+```
+###Estimando regresion lineal
+```{r}
+reg1 <- lm(speed ~ dist, data = autos)
+```
+Y =  8.28391+0.16557*X
+
+###ESTADISTICA DESCRIPTIVA
+```{r}
+summary(reg1)
+```
+###IDENTIFICANDO OUTLIERS
+```{r}
+boxplot(autos$dist, main = "Distancia", boxwex = 0.5,col="blue")
+
+impute_outliers <- function(z, removeNA = TRUE){
+  quantiles <- quantile(z, c(0.05, 0.95), na.rm = removeNA)
+  z[z<quantiles[1]] <- mean(z, na.rm = removeNA)
+  z[z>quantiles[2]] <- median(z, na.rm = removeNA)
+  z
+}
+```
+###ELIMINANDO OUTLIERS
+```{r}
+imputed_data <- impute_outliers(autos$dist)
+
+par(mfrow = c(1,2))
+
+boxplot(imputed_data, main = "Distancia sin outliers", col = 2)
+```
+###PREDICCION
+```{r}
+for (x in autos$dist){
+ print(8.28391+0.16557*x)
+}
+```
+###INTERVALOS DE CONFIANZA
+```{r}
+confint(reg1, level = 0.95)
+```
+###ANOVA
+```{r}
+anova(reg1)
+```
+###TEST NORMALIDAD
+```{r}
+data <- read.csv("autos.csv", header=T,sep=",")
+shapiro.test(autos$dist)
+```
+###CURTOSIS Y ASIMETRIA
+```{r}
+skewness(autos$dist)
+
+kurtosis(autos$dist)
+```
+###TEST T 
+```{r}
+t.test(autos$dist, paired = F)
+```
+###GRAFICOS
+####DISPERSION
+```{r}
+plot(autos$dist, autos$speed, xlab='dist', ylab='speed')
+```
+####HISTOGRAMAS
+```{r}
+hist(main='Histograma Distancia', autos$dist, xlab='dist', ylab='speed')
+
+```
+```{r}
+hist(main='Histograma Velocidad', autos$speed, xlab='dist', ylab='speed')
+```
+
+
